@@ -529,9 +529,6 @@ function App() {
   }
 
   // =========================================================
-  // PART 2 YAHAN SE CONTINUE HOGA
-  // =========================================================
-    // =========================================================
   // AUTH — LOGIN
   // =========================================================
 
@@ -539,7 +536,9 @@ function App() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Email and password required.");
+      alert(
+        "Email and password required."
+      );
       return;
     }
 
@@ -566,7 +565,9 @@ function App() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Email and password required.");
+      alert(
+        "Email and password required."
+      );
       return;
     }
 
@@ -624,7 +625,6 @@ function App() {
 
     if (!selected) return;
 
-    // 100 MB LIMIT
     if (
       selected.size >
       MAX_STORAGE
@@ -637,7 +637,6 @@ function App() {
       return;
     }
 
-    // ALLOWED FILE TYPES
     const allowedTypes = [
       "image/jpeg",
       "image/png",
@@ -673,7 +672,6 @@ function App() {
       return;
     }
 
-    // STORAGE LIMIT
     if (
       totalStorage + selected.size >
       MAX_STORAGE
@@ -735,7 +733,9 @@ function App() {
 
     event.target.value = "";
 
-    alert("File uploaded successfully.");
+    alert(
+      "File uploaded successfully."
+    );
   }
 
   // =========================================================
@@ -874,7 +874,7 @@ function App() {
         (folder) =>
           folder.name
             .toLowerCase() ===
-          cleanName.toLowerCase() &&
+            cleanName.toLowerCase() &&
           folder.parent ===
             currentFolder
       );
@@ -1142,13 +1142,65 @@ function App() {
   }
 
   // =========================================================
-  // PREVIEW
+  // PREVIEW FILE
   // =========================================================
 
-  function handlePreview(
-    file
-  ) {
-    setPreviewFile(file);
+  async function handlePreview(file) {
+    if (!session?.user?.id) return;
+
+    // Remove old preview URL if one exists
+    if (previewFile?.previewUrl) {
+      URL.revokeObjectURL(
+        previewFile.previewUrl
+      );
+    }
+
+    const path =
+      currentFolder
+        ? `${session.user.id}/${currentFolder}/${file.name}`
+        : `${session.user.id}/${file.name}`;
+
+    const {
+      data,
+      error,
+    } = await supabase.storage
+      .from("cloudvault-files")
+      .download(path);
+
+    if (error) {
+      console.error(
+        "Preview error:",
+        error
+      );
+
+      alert(
+        `Preview failed: ${error.message}`
+      );
+
+      return;
+    }
+
+    const previewUrl =
+      URL.createObjectURL(data);
+
+    setPreviewFile({
+      ...file,
+      previewUrl,
+    });
+  }
+
+  // =========================================================
+  // CLOSE PREVIEW
+  // =========================================================
+
+  function closePreview() {
+    if (previewFile?.previewUrl) {
+      URL.revokeObjectURL(
+        previewFile.previewUrl
+      );
+    }
+
+    setPreviewFile(null);
   }
 
   // =========================================================
@@ -1212,9 +1264,6 @@ function App() {
     ).length;
 
   // =========================================================
-  // PART 3 WILL CONTINUE HERE
-  // =========================================================
-    // =========================================================
   // AUTH SCREEN
   // =========================================================
 
@@ -1264,7 +1313,9 @@ function App() {
                 type="email"
                 value={email}
                 onChange={(e) =>
-                  setEmail(e.target.value)
+                  setEmail(
+                    e.target.value
+                  )
                 }
                 placeholder="Enter your email"
                 required
@@ -1870,9 +1921,6 @@ function App() {
         )}
 
         {/* ===================================================
-            PART 4 WILL CONTINUE HERE
-            =================================================== */}
-                    {/* ===================================================
             MY FILES
             =================================================== */}
 
@@ -1935,6 +1983,7 @@ function App() {
                   color: "#667085",
                 }}
               >
+
                 <button
                   className="secondary-button"
                   onClick={() =>
@@ -1949,6 +1998,7 @@ function App() {
                     <React.Fragment
                       key={`${part}-${index}`}
                     >
+
                       <span>/</span>
 
                       <button
@@ -1969,6 +2019,7 @@ function App() {
                       >
                         {part}
                       </button>
+
                     </React.Fragment>
                   )
                 )}
@@ -1981,6 +2032,7 @@ function App() {
                 >
                   ← Back
                 </button>
+
               </div>
             )}
 
@@ -1992,10 +2044,12 @@ function App() {
                   marginBottom: "12px",
                 }}
               >
+
                 <div className="uploading-indicator">
                   <div className="uploading-spinner" />
                   Uploading file...
                 </div>
+
               </div>
             )}
 
@@ -2107,10 +2161,13 @@ function App() {
 
               {loadingFiles ? (
                 <div className="loading-container">
+
                   <div className="loading-spinner" />
+
                   <p>
                     Loading files...
                   </p>
+
                 </div>
               ) : filteredFiles.length ===
                 0 ? (
@@ -2288,6 +2345,7 @@ function App() {
             <div className="section-header">
 
               <div>
+
                 <div className="section-title">
                   Shared With Me
                 </div>
@@ -2296,6 +2354,7 @@ function App() {
                   Files shared through
                   CloudVault
                 </div>
+
               </div>
 
             </div>
@@ -2417,6 +2476,7 @@ function App() {
                               className="file-action"
                               title="Download"
                               onClick={async () => {
+
                                 const {
                                   data,
                                   error,
@@ -2465,6 +2525,7 @@ function App() {
                                 URL.revokeObjectURL(
                                   url
                                 );
+
                               }}
                             >
                               ⬇
@@ -2494,6 +2555,7 @@ function App() {
             <div className="section-header">
 
               <div>
+
                 <div className="section-title">
                   Activity History
                 </div>
@@ -2502,6 +2564,7 @@ function App() {
                   Recent activity on your
                   CloudVault account
                 </div>
+
               </div>
 
             </div>
@@ -2712,6 +2775,7 @@ function App() {
                 <button
                   className="primary-button"
                   onClick={() => {
+
                     setSelectedFile(
                       null
                     );
@@ -2719,6 +2783,7 @@ function App() {
                     handleDownload(
                       selectedFile
                     );
+
                   }}
                 >
                   ⬇ Download
@@ -2732,15 +2797,14 @@ function App() {
         )}
 
         {/* ===================================================
-            PREVIEW MODAL
+            UPDATED PREVIEW MODAL
+            IMAGE + PDF
             =================================================== */}
 
         {previewFile && (
           <div
             className="modal-overlay"
-            onClick={() =>
-              setPreviewFile(null)
-            }
+            onClick={closePreview}
           >
 
             <div
@@ -2750,6 +2814,8 @@ function App() {
               }
             >
 
+              {/* PREVIEW HEADER */}
+
               <div className="modal-header">
 
                 <h2>
@@ -2758,32 +2824,103 @@ function App() {
 
                 <button
                   className="modal-close"
-                  onClick={() =>
-                    setPreviewFile(
-                      null
-                    )
-                  }
+                  onClick={closePreview}
                 >
                   ✕
                 </button>
 
               </div>
 
-              <div className="preview-content">
+              {/* PREVIEW CONTENT */}
 
-                {previewFile.metadata
-                  ?.mimetype?.startsWith(
-                    "image/"
-                  ) ? (
+              <div
+                className="preview-content"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: "300px",
+                  padding: "18px",
+                }}
+              >
+
+                {/* IMAGE PREVIEW */}
+
+                {[
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "gif",
+                  "webp",
+                ].includes(
+                  previewFile.name
+                    ?.split(".")
+                    .pop()
+                    ?.toLowerCase()
+                ) && (
+
                   <img
-                    src={URL.createObjectURL(
-                      previewFile
-                    )}
+                    src={
+                      previewFile.previewUrl
+                    }
                     alt={
                       previewFile.name
                     }
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "70vh",
+                      objectFit: "contain",
+                      borderRadius: "12px",
+                      display: "block",
+                    }}
                   />
-                ) : (
+
+                )}
+
+                {/* PDF PREVIEW */}
+
+                {previewFile.name
+                  ?.toLowerCase()
+                  .endsWith(".pdf") && (
+
+                  <iframe
+                    src={
+                      previewFile.previewUrl
+                    }
+                    title={
+                      previewFile.name
+                    }
+                    style={{
+                      width: "100%",
+                      height: "70vh",
+                      minHeight: "500px",
+                      border: "none",
+                      borderRadius: "12px",
+                      background:
+                        "#ffffff",
+                    }}
+                  />
+
+                )}
+
+                {/* UNSUPPORTED FILE */}
+
+                {![
+                  "jpg",
+                  "jpeg",
+                  "png",
+                  "gif",
+                  "webp",
+                ].includes(
+                  previewFile.name
+                    ?.split(".")
+                    .pop()
+                    ?.toLowerCase()
+                ) &&
+                  !previewFile.name
+                    ?.toLowerCase()
+                    .endsWith(".pdf") && (
+
                   <div className="preview-placeholder">
 
                     <div className="preview-placeholder-icon">
@@ -2819,6 +2956,7 @@ function App() {
                     </button>
 
                   </div>
+
                 )}
 
               </div>
